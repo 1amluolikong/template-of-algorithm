@@ -1,0 +1,86 @@
+c++
+===============关键字==============
+decltype：用于推导表达式类型，在sort中需要一个直接可以使用的比较函数所以不要decltype，在priority_queue的初始化就需要，如：priority_queue<T,vector<T>,decktype(compare)>
+namespace：用于定义一个命名空间，内部成员可用::访问
+lambda表达式的一些小故事：{
+c++11：不能使用auto推导lambda表达式的类型，也不能在参数里面去使用auto&&实现递归
+c++14：加入泛型lambda，可以使用auto推导lambda类型，也可以auto&&递归，但是不能this
+c++23：引入this auto&&
+}
+
+
+===============算法常用头文件===========
+<algorithm>
+any_of：判断范围内有没有符合predicate（是一个lambda表达式返回bool）的元素（any_of（begin，end，predicate））（在ranges库内）
+
+make_heap：将一个序列重新排列使其满足堆的数据结构特性（默认是变为大顶堆，注：这里第一个值能够确保是最大值，但是后面的值不一定是有序的）make_heap（begin，end，compare（可选））
+
+push_heap：将一个新元素（容器末尾的元素）加入到堆中，并维持堆属性。注：一般先push_back再push_heap（push_heap（begin，end，compare（可选，必须和make_heap一样））
+
+pop_heap：将最大值下沉到容器的末尾，剩余元素保留堆属性。注：一般pop_heap后接pop_back（pop_heap（begin，end，compare（同上））
+
+sort：排序（begin，end，compare（可选））（在ranges库内，但是使用ranges的参数和原先的不同，不用复杂的排序使用投影会非常好用，ranges::sort（container， compare（可选），projection（可选）））
+
+lower_bound：查找第一个大于等于x的值（begin，end，x，compare（可选，参数（comp_val，val）））（ranges库内，规则和sort差不多，lambda表示里面的两个参数分别代表来自范围的元素，查找的目标值）
+count：计算容器里某一个东西的个数（begin，end，x（所有数据类型））（ranges库内）
+clamp：min（max（a， b），c）， clamp（a， b， c）
+find：查找容器里的第一个要找的元素，返回迭代器，（注：有些容器自带find，建议使用自带的）
+abs：计算一个数的绝对值，里面不能是uint
+next_permutation：生成所有的排列，前提是数组有序，他的最后一个排列是降序的，从而判断是否结束排列
+nth_element：将第k小的数放在指定位置（begin，nth，end，cmp）（在ranges库内）
+unique：将所有重复的元素挤到容器的末尾，需要自己决定是否删除，返回值是指向第一个重复元素的迭代器（一般搭配erase做到删除的效果）（first，last，cmp）
+
+<bit>
+countr_zero：返回一个数开始的连续的0个数
+popcount：返回一个数的1的个数
+bit_width：返回二进制位长度
+
+<vector>
+reserve：给数组预分配空间
+
+<tuple>
+tie：创建一个元组，里面的元素是传入值的引用，返回值是tuple（T&，T&.......）
+
+<string> {
+ 	substr：提取出一个字符串的子串（pos，count）
+	find：从头开始找一个我要找的字符串，如果没找到就返回string：：npos（其实就是-1），返回值是索引
+	rfind：从反方向开始找，就是和上面的相反
+}
+stoi：将一个字符串转化为整形，开头不能是字母，不能是空串（stoi（s））
+stoll：同上，不过是longlong类型
+string：创建一个字符串（count， char）
+
+<unordered_set>
+unordereed_set：哈希集合，改写完记得把这个改写的传给它 {
+成员方法：
+insert：插入一个T，返回值是一个pair，{iterator（指向元素的迭代器），bool（是否插入成功，已经有就失败）}
+emplace：同上
+}
+
+<set>
+set：有序集合，基于红黑树实现的，和优先队列一样可以更改排序方式
+multiset：有序集合，元素可重复，删除元素时会把所有的等于这个值的元素都删了，用迭代器可以做到单点删除
+
+<queue>
+priority_queue：就是个堆，默认为大顶堆，第三个参数是比较函数的类型，不是一个函数，优先pop堆顶元素
+queue：队列
+
+<utility>
+pair：是一个元素类型，两个pair可以直接比较大小
+
+<sstream>
+istringstream：将字符串解析和转换，注：提取出来的操作符会做类型转换，默认空格制表符换行符作为分割。（通过利用getline可以按行提取getline（输入流名，存放的位置，标准（可选，默认为换行符）））
+
+
+=====================工程==================
+<mutex>
+mutex：mutex类型，使用前创建此类型，可以手动上锁（.lock()）解锁（.unlock()），使用lock_guard可以自动上锁和解锁lock_guard<mutex>
+<thread>
+thread：线程类型，thread（此线程所要执行的函数， 参数。。。），线程的优点：每个线程独立进行节省时间
+{
+detach：当需要线程独立进行时就使用它
+
+}
+<chrono> //时间相关的命名空间基本用::访问里面的东西
+millisecond：创建一个毫秒时间
+second：创建秒
