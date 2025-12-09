@@ -16,6 +16,110 @@
 #include<bitset>
 #include<climits>
 
+
+// 用贡献法计算符合要求的数字的和
+long long digitDPContribution(long long low, long long high, int k) {
+    string low_s = to_string(low);
+    string high_s = to_string(high);
+    int n = high_s.size();
+    int diff_lh = n - low_s.size();
+    vector memo(n, vector<pair<long long, long long>>(1 << 10, { -1, -1 }));
+
+    // dfs 返回两个数：子树合法数字个数，子树数位总和
+    auto dfs = [&](this auto&& dfs, int i, int mask, bool limit_low, bool limit_high) -> pair<long long, long long> {
+        if (i == n) {
+            // 如果没有特殊约束，那么能递归到终点的都是合法数字
+            return { 1, 0 };
+        }
+
+        if (!limit_low && !limit_high && memo[i][mask].first >= 0) {
+            return memo[i][mask];
+        }
+
+        int lo = limit_low && i >= diff_lh ? low_s[i - diff_lh] - '0' : 0;
+        int hi = limit_high ? high_s[i] - '0' : 9;
+
+        long long cnt = 0, sum = 0;
+        int d = lo;
+
+        // 如果前导零不影响答案，去掉这个 if block
+        if (limit_low && i < diff_lh) {
+            // 不填数字，上界不受约束
+            tie(cnt, sum) = dfs(i + 1, 0, true, false);
+            d = 1;
+        }
+
+        for (; d <= hi; d++) {
+            int new_mask = mask | 1 << d;
+            if (popcount((uint32_t)new_mask) > k) { // 不满足要求
+                continue;
+            }
+            auto [sub_cnt, sub_sum] = dfs(i + 1, new_mask, limit_low && d == lo, limit_high && d == hi);
+            cnt += sub_cnt; // 累加子树的合法数字个数
+            sum += sub_sum; // 累加子树的数位总和
+            sum += d * sub_cnt; // d 会出现在 sub_cnt 个数中（贡献法）
+            // cnt %= MOD; sum %= MOD;
+        }
+
+        pair<long long, long long> res = { cnt, sum };
+        if (!limit_low && !limit_high) {
+            memo[i][mask] = res;
+        }
+        return res;
+        };
+
+    return dfs(0, 0, true, true).second;
+}
+
+// to get number of valid scheme
+long long digitDP(long long low, long long high, int target) {
+    string low_s = to_string(low);
+    string high_s = to_string(high);
+    int n = high_s.size();
+    int diff_lh = n - low_s.size();
+    vector memo(n, vector<long long>(target + 1, -1));
+
+    auto dfs = [&](this auto&& dfs, int i, int cnt0, bool limit_low, bool limit_high) -> long long {
+        if (cnt0 > target) {
+            return 0; // 不合法
+        }
+        if (i == n) {
+            return cnt0 == target;
+        }
+
+        if (!limit_low && !limit_high && memo[i][cnt0] >= 0) {
+            return memo[i][cnt0];
+        }
+
+        int lo = limit_low && i >= diff_lh ? low_s[i - diff_lh] - '0' : 0;
+        int hi = limit_high ? high_s[i] - '0' : 9;
+
+        long long res = 0;
+        int d = lo;
+
+        // 通过 limit_low 和 i 可以判断能否不填数字，无需 is_num 参数
+        // 如果前导零不影响答案，去掉这个 if block
+        if (limit_low && i < diff_lh) {
+            // 不填数字，上界不受约束
+            res = dfs(i + 1, 0, true, false);
+            d = 1;
+        }
+
+        for (; d <= hi; d++) {
+            // 统计 0 的个数
+            res += dfs(i + 1, cnt0 + (d == 0), limit_low && d == lo, limit_high && d == hi);
+            // res %= MOD;
+        }
+
+        if (!limit_low && !limit_high) {
+            memo[i][cnt0] = res;
+        }
+        return res;
+        };
+
+    return dfs(0, 0, true, true);
+}
+
 struct TupleHash {
     template<typename T>
     static void hash_combine(size_t& seed, const T& v) {
