@@ -4,13 +4,13 @@ updating
 <svg width="100" height="100" viewBox="0 0 100 100">
   <circle cx="50" cy="50" r="45" fill="none" stroke="#8b5cf6" stroke-width="3">
     <animate 
-    attributeName="r"
-    values="45;50;45"
-    dur="3s" repeatCount="indefinite"/>
-    <animate
-    attributeName="opacity"
-    values="1;0.7;1"
-    dur="3s" repeatCount="indefinite"/>
+      attributeName="r" 
+      values="45;50;45" 
+      dur="3s" repeatCount="indefinite" />
+    <animate 
+      attributeName="opacity" 
+      values="1;0.7;1" 
+      dur="3s" repeatCount="indefinite" />
   </circle>
-  <image href="anke.jpg" x="10" y="10" width="80" height="80"/>
+  <image href="anke.jpg" x="10" y="10" width="80" height="80" />
 </svg>
