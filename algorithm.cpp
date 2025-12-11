@@ -16,6 +16,63 @@
 #include<bitset>
 #include<climits>
 
+// 回滚莫队
+void solve() {
+    int n; cin >> n;
+    int block = ceil(n / sqrt(n * 2));
+    int max_cnt = 0, min_val = 0;
+    unordered_map<int, int> cnt;
+    auto add = [&](int x) {
+        int c = ++cnt[x];
+        if (c > max_cnt) {
+            max_cnt = c;
+            min_val = x;
+        }
+        else if (c == max_cnt) {
+            min_val = min(min_val, x);
+        }
+        };
+    vector<int> a(n);
+    for (int& x : a) cin >> x;
+    struct query {
+        int bid, l, r, qid;
+    };
+    vector<query> qs;
+    vector<int> ans(n);
+    for (int i = 0; i < n; i++) {
+        int l, r; cin >> l >> r;
+        l--;
+        if (r - l > block) {
+            qs.emplace_back(l / block, l, r, i);
+            continue;
+        }
+        for (int j = l; j < r; j++) add(a[j]);
+        ans[i] = min_val;
+        cnt.clear();
+        max_cnt = 0;
+    }
+    ranges::sort(qs, {}, [&](const auto& q) { return pair(q.bid, q.r); });
+    int r = 0;
+    for (int i = 0; i < qs.size(); i++) {
+        auto& q = qs[i];
+        int b = (q.bid + 1) * block;
+        if (i == 0 || q.bid > qs[i - 1].bid) {
+            r = b;
+            cnt.clear();
+            max_cnt = 0;
+        }
+        for (; r < q.r; r++) {
+            add(a[r]);
+        }
+        int tmp_max_cnt = max_cnt, tmp_min_val = min_val;
+        for (int j = q.l; j < b; j++) add(a[j]);
+        ans[q.qid] = min_val;
+        max_cnt = tmp_max_cnt, min_val = tmp_min_val;
+        for (int j = q.l; j < b; j++) cnt[a[j]]--;
+
+    }
+    for (int& x : ans) cout << x << '\n';
+}
 
 // 用贡献法计算符合要求的数字的和
 long long digitDPContribution(long long low, long long high, int k) {
