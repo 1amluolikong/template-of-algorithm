@@ -30,6 +30,15 @@ next_permutation：生成所有的排列，前提是数组有序，他的最后�
 nth_element：将第k小的数放在指定位置（begin，nth，end，cmp）（在ranges库内）
 unique：将所有重复的元素挤到容器的末尾，需要自己决定是否删除，返回值是指向第一个重复元素的迭代器（一般搭配erase做到删除的效果）（first，last，cmp）
 
+<ranges>
+有些在algorithm的介绍里面提及了
+view库：用::拿到域内的函数（有点像jvav的流式编程） {
+	split：以某个标准分割容器
+	filter：过滤掉lambda函数里面要过滤的值，要过滤的为true
+	transform：对容器内的东西做一些改变如：+-*/
+	take：提取前n个值
+}
+
 <bit>
 countr_zero：返回一个数开始的连续的0个数
 popcount：返回一个数的1的个数
