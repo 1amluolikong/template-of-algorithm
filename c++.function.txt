@@ -44,8 +44,16 @@ countr_zero：返回一个数开始的连续的0个数
 popcount：返回一个数的1的个数
 bit_width：返回二进制位长度
 
+<cctype>
+isalpha：判断是否是英文字母
+isdigit：判断是否是数字
+isalnum：判断是否是英文字母或者数字
+
 <vector>
 reserve：给数组预分配空间
+push_back：只能一个个的往后面插入
+insert：可以实现多个元素一起插入进容器
+
 
 <tuple>
 tie：创建一个元组，里面的元素是传入值的引用，返回值是tuple（T&，T&.......）
