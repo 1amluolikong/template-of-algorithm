@@ -420,6 +420,50 @@ public:
     }
 };
 
+class Solution {
+public:
+    vector<long long> minOperations(vector<int>& nums, int k, vector<vector<int>>& queries) {
+        int n = nums.size();
+        vector<int> f(n);
+        for (int i = 1; i < n; i++) {
+            f[i] = nums[i] % k == nums[i - 1] % k ? f[i - 1] : i;
+        }
+
+        vector<int> sorted_nums = nums;
+        ranges::sort(sorted_nums);
+        sorted_nums.erase(ranges::unique(sorted_nums).begin(), sorted_nums.end());
+        int m = sorted_nums.size();
+
+        vector<node*> t(n + 1);
+        t[0] = node::build(0, m);
+        for (int i = 0; i < n; i++) {
+            int j = ranges::lower_bound(sorted_nums, nums[i]) - sorted_nums.begin();
+            t[i + 1] = t[i]->add(j, nums[i]);
+        }
+
+        vector<long long> ans;
+        ans.reserve(queries.size());
+        for (auto& q : queries) {
+            int l = q[0], r = q[1];
+            if (f[r] > f[l]) {
+                ans.push_back(-1);
+                continue;
+            }
+            r++;
+            int m = r - l;
+            int i = t[r]->kth(t[l], m / 2 + 1);
+            long long midian = sorted_nums[i];
+
+            long long tot = t[r]->sum - t[l]->sum;
+            auto [cnt_l, sum_l] = t[r]->query(t[l], i);
+            long long sum = midian * cnt_l - sum_l;
+            sum += tot - sum_l - (m - cnt_l) * midian;
+            ans.push_back(sum / k);
+        }
+        return ans;
+    }
+};
+
 template<typename T, typename Compare = less<T>>
 class lazy_heap {
     priority_queue<T, vector<T>, Compare> pq;
