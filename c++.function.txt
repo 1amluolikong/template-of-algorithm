@@ -13,6 +13,8 @@ c++23：引入this auto&&
 <algorithm>
 any_of：判断范围内有没有符合predicate（是一个lambda表达式返回bool）的元素（any_of（begin，end，predicate））（在ranges库内）
 
+all_of：判断范围内的元素是否全部符合predicate（是一个lambda表达式返回bool）（all_of（begin，end，predicate）
+
 make_heap：将一个序列重新排列使其满足堆的数据结构特性（默认是变为大顶堆，注：这里第一个值能够确保是最大值，但是后面的值不一定是有序的）make_heap（begin，end，compare（可选））
 
 push_heap：将一个新元素（容器末尾的元素）加入到堆中，并维持堆属性。注：一般先push_back再push_heap（push_heap（begin，end，compare（可选，必须和make_heap一样））

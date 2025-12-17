@@ -16,6 +16,65 @@
 #include<bitset>
 #include<climits>
 
+// 用数字来枚举每个子集 + sosdp
+int countEffective(vector<int>& nums) {
+    if (ranges::all_of(nums, [&](int& x) {return x == nums[0]; })) return 1;
+
+    int s_or = reduce(nums.begin(), nums.end(), 0, bit_or<>());
+    int n = nums.size();
+    int w = bit_width((uint32_t)s_or);
+    int u = 1 << w;
+    vector<int> f(u);
+    for (int& x : nums) f[x]++;
+
+    for (int i = 0; i < w; i++) for (int s = 0; s < u; s++) {
+        s |= 1 << i;
+        f[s] += f[s ^ (1 << i)];
+    }
+
+    int res = 0;
+    int sub_or = s_or;
+    do {
+        int sign = popcount((uint32_t)s_or) % 2 == popcount((uint32_t)sub_or) % 2 ? 1 : -1;
+        res = (res + sign * pow2[f[sub_or]]) % mod;
+        sub_or = (sub_or - 1) & s_or;
+    } while (sub_or != s_or);
+    return ((pow2[n] - res) % mod + mod) % mod;
+}
+
+// brute force palindrome, O(sqrt(n)log(n))
+vector<int> palindromes;
+auto init = []() {
+    constexpr int MX = 1e5;
+    constexpr int BASE = 2;
+    palindromes.push_back(0);
+    for (int pw = 1; ; pw *= BASE) {
+        for (int i = pw; i < pw * BASE; i++) {
+            long long x = i;
+            for (int t = i / BASE; t > 0; t /= BASE) {
+                x = (x * BASE + t % BASE);
+            }
+            if (x > MX) {
+                palindromes.push_back(5049);
+                return 0;
+            }
+            palindromes.push_back(x);
+        }
+        for (int i = pw; i < pw * BASE; i++) {
+            long long x = i;
+            for (int t = i; t > 0; t /= BASE) {
+                x = x * BASE + t % BASE;
+            }
+            if (x > MX) {
+                palindromes.push_back(5049);
+                return 0;
+            }
+            palindromes.push_back(x);
+        }
+    }
+    return 0;
+    }();
+
 // quick flip binary bit
 uint bitreverse32(uint n) {
     const uint32_t M1 = 0x55555555; // 01010101010101010101010101010101
