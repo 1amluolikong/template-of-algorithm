@@ -16,6 +16,60 @@
 #include<bitset>
 #include<climits>
 
+
+// 树状数组 + dfs序
+void solve() {
+    int n, m, r; cin >> n >> m >> r;
+    r--;
+    vector<int> a(n); for (int& x : a) cin >> x;
+    vvi g(n);
+    for (int i = 0; i < n - 1; i++) {
+        int x, y; cin >> x >> y;
+        x--; y--;
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+    int time = 0;
+    vector<int> in(n), out(n);
+    auto dfs = [&](this auto&& dfs, int x, int fa)-> void {
+        in[x] = time++;
+        for (int& y : g[x]) {
+            if (y != fa) {
+                dfs(y, x);
+            }
+        }
+        out[x] = time - 1;
+        };
+    dfs(r, -1);
+    vector<ll> s(n + 1);
+    auto update = [&](int i, int x) {
+        for (; i <= n; i += i & -i) {
+            s[i] += x;
+        }
+        };
+    auto pre = [&](int i)-> ll {
+        ll res = 0;
+        for (; i; i &= i - 1) {
+            res += s[i];
+        }
+        return res;
+        };
+    for (int i = 0; i < n; i++) update(in[i] + 1, a[i]);
+    int op, b, x;
+    while (m--) {
+        cin >> op;
+        if (op == 1) {
+            cin >> b >> x; b--;
+            update(in[b] + 1, x);
+        }
+        else {
+            cin >> b; b--;
+            ll ans = pre(out[b] + 1) - pre(in[b]);
+            cout << ans << '\n';
+        }
+    }
+}
+
 // 用数字来枚举每个子集 + sosdp
 int countEffective(vector<int>& nums) {
     if (ranges::all_of(nums, [&](int& x) {return x == nums[0]; })) return 1;
@@ -30,7 +84,7 @@ int countEffective(vector<int>& nums) {
     for (int i = 0; i < w; i++) for (int s = 0; s < u; s++) {
         s |= 1 << i;
         f[s] += f[s ^ (1 << i)];
-    }
+    } // sosdp
 
     int res = 0;
     int sub_or = s_or;
@@ -38,7 +92,7 @@ int countEffective(vector<int>& nums) {
         int sign = popcount((uint32_t)s_or) % 2 == popcount((uint32_t)sub_or) % 2 ? 1 : -1;
         res = (res + sign * pow2[f[sub_or]]) % mod;
         sub_or = (sub_or - 1) & s_or;
-    } while (sub_or != s_or);
+    } while (sub_or != s_or); // 数字枚举子集
     return ((pow2[n] - res) % mod + mod) % mod;
 }
 
@@ -750,3 +804,42 @@ long long qpow(long long x, long long n) {
     return res;
 }
 
+// 解锁你的lambda表达式吧
+template<typename F>
+struct YCombinator {
+    F f;  // 存储 lambda 表达式
+
+    // 构造函数 - 支持完美转发
+    template<typename Func>
+    explicit YCombinator(Func&& func)
+        : f(std::forward<Func>(func)) {
+    }
+
+    // 普通调用
+    template<typename... Args>
+    auto operator()(Args&&... args)
+        -> decltype(f(std::declval<YCombinator&>(), std::forward<Args>(args)...)) {
+        return f(*this, std::forward<Args>(args)...);
+    }
+
+    // const 调用版本
+    template<typename... Args>
+    auto operator()(Args&&... args) const
+        -> decltype(f(std::declval<const YCombinator&>(), std::forward<Args>(args)...)) {
+        return f(*this, std::forward<Args>(args)...);
+    }
+};
+
+// 值捕获版本 - 复制 lambda
+template<typename F>
+YCombinator<typename std::decay<F>::type> y_combine(F&& f) {
+    return YCombinator<typename std::decay<F>::type>(std::forward<F>(f));
+}
+
+// 引用捕获版本 - 存储引用包装器
+template<typename F>
+YCombinator<std::reference_wrapper<typename std::remove_reference<F>::type>>
+y_combine_ref(F&& f) {
+    return YCombinator<std::reference_wrapper<typename std::remove_reference<F>::type>>(
+        std::ref(f));
+}
