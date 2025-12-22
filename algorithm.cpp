@@ -17,6 +17,41 @@
 #include<climits>
 
 
+//string LCS(string s1, string s2) {
+//    int n = s1.size();
+//
+//}
+
+// 带权并查集
+class UnionFind {
+    vector<int> fa;
+public:
+    vector<double> mul;
+    UnionFind(int n) : fa(n), mul(n, 1) {
+        ranges::iota(fa, 0);
+    }
+
+    int find(int x) {
+        if (fa[x] != x) {
+            int root = find(fa[x]);
+            mul[x] *= mul[fa[x]];
+            fa[x] = root;
+        }
+        return fa[x];
+    }
+
+    bool same(int x, int y) {
+        return find(x) == find(y);
+    }
+
+    void merge(int from, int to, double v) {
+        int x = find(from), y = find(to);
+        if (x == y) return;
+        mul[x] = mul[to] * v / mul[from];
+        fa[x] = y;
+    }
+};
+
 // 树状数组 + dfs序
 void solve() {
     int n, m, r; cin >> n >> m >> r;
