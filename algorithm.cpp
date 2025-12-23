@@ -22,6 +22,95 @@
 //
 //}
 
+// Tree Knapsack of time O(NW)
+// can improve time complexity when question have reliance
+void solve() {
+    int n, W;
+    cin >> n >> W;
+    vvi g(n + 1);
+    vector<int> w(n + 1), v(n + 1);
+
+    for (int i = 1; i <= n; i++) {
+        int x;
+        cin >> x;
+        g[x].push_back(i);
+    }
+
+    for (int i = 1; i <= n; i++)
+        cin >> w[i];
+
+    for (int i = 1; i <= n; i++)
+        cin >> v[i];
+
+    vector<int> sz(n + 1), seq;
+    function<void(int)> dfs = [&](int x) {
+        sz[x] = 1;
+        for (int& y : g[x]) {
+            dfs(y);
+            sz[x] += sz[y];
+        }
+        seq.push_back(x);
+        };
+    dfs(0);
+    vvi f(n + 2, vector<int>(W + 1));
+    for (int i = 0; i < seq.size(); i++) {
+        int x = seq[i];
+        for (int j = 0; j <= W; j++) {
+            if (j >= w[x]) {
+                f[i + 1][j] = max(f[i + 1 - sz[x]][j], f[i][j - w[x]] + v[x]);
+            }
+            else {
+                f[i + 1][j] = f[i + 1 - sz[x]][j];
+            }
+        }
+    }
+    cout << f[n + 1][W] << '\n';
+}
+
+// Tree Knapsack of time O(NW^2) 
+// not reliance
+void solve() {
+    int n, W;
+    cin >> n >> W;
+    vvi g(n + 1);
+    vector<int> w(n + 1), v(n + 1);
+
+    for (int i = 1; i <= n; i++) {
+        int x;
+        cin >> x;
+        g[x].push_back(i);
+    }
+
+    for (int i = 1; i <= n; i++)
+        cin >> w[i];
+
+    for (int i = 1; i <= n; i++)
+        cin >> v[i];
+
+    auto dfs = [&](this auto&& dfs, int x)-> vector<int> {
+        vector<int> sub_f(W + 1);
+
+        for (int& y : g[x]) {
+            auto yf = dfs(y);
+
+            for (int i = W; i >= 0; i--) {
+                for (int jy = 0; jy <= i; jy++) {
+                    sub_f[i] = max(sub_f[i], sub_f[i - jy] + yf[jy]);
+                }
+            }
+        }
+
+        vector<int> f(W + 1);
+
+        for (int i = W; i >= w[x]; i--) {
+            f[i] = max(f[i], sub_f[i - w[x]] + v[x]);
+        }
+
+        return f;
+        };
+    cout << dfs(0)[W] << '\n';
+}
+
 // 带权并查集
 class UnionFind {
     vector<int> fa;
