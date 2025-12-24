@@ -24,6 +24,8 @@ pop_heap：将最大值下沉到容器的末尾，剩余元素保留堆属性。
 sort：排序（begin，end，compare（可选））（在ranges库内，但是使用ranges的参数和原先的不同，不用复杂的排序使用投影会非常好用，ranges::sort（container， compare（可选），projection（可选）））
 
 lower_bound：查找第一个大于等于x的值（begin，end，x，compare（可选，参数（comp_val，val）））（ranges库内，规则和sort差不多，lambda表示里面的两个参数分别代表来自范围的元素，查找的目标值）
+对pair数组使用lower_bound需要这样auto it = --ranges::lower_bound(st, start_time, {}, &pair<int, int>::first);
+
 count：计算容器里某一个东西的个数（begin，end，x（所有数据类型））（ranges库内）
 clamp：min（max（a， b），c）， clamp（a， b， c）
 find：查找容器里的第一个要找的元素，返回迭代器，（注：有些容器自带find，建议使用自带的）
