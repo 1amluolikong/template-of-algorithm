@@ -22,6 +22,74 @@
 //
 //}
 
+
+
+// https://usaco.org/index.php?page=viewproblem2&cpid=1309
+#pragma region sos-two-demension
+ll qpow(ll x, ll n) {
+    ll res = 1;
+    while (n) {
+        if (n & 1) {
+            res = res * x % mod;
+        }
+        x = x * x % mod;
+        n /= 2;
+    }
+    return res;
+}
+
+ll fac[MAX + 1], inv_f[MAX + 1];
+auto init = []() {
+    fac[0] = inv_f[0] = 1;
+    for (int i = 1; i <= MAX; i++) {
+        fac[i] = fac[i - 1] * i % mod;
+    }
+    inv_f[MAX] = qpow(fac[MAX], mod - 2);
+    for (int i = MAX; i > 0; i--) {
+        inv_f[i - 1] = inv_f[i] * i % mod;
+    }
+    return 0;
+    }();
+
+void solve() {
+    int n, m; cin >> n >> m;
+    vector<int> a(n);
+    int u = 1 << m;
+    for (int i = 0; i < m; i++) {
+        string s;
+        cin >> s;
+        for (int j = 0; j < n; j++) {
+            char c = s[j];
+            if (c == 'H') a[j] |= 1 << i;
+        }
+    }
+    vector<ll> cnt(u), ways(u);
+    for (int& mask : a) {
+        cnt[mask]++;
+    }
+    for (int& mask : a) if (ways[mask] == 0) {
+        int k = cnt[mask];
+        for (int r = 1; r <= k; r++) {
+            ways[mask] = (ways[mask] + fac[k] * inv_f[k - r] % mod) % mod;
+        }
+    }
+    vector<vector<ll>> dp(u, vector<ll>(m + 1));
+    ll ans = 0;
+    for (int s = 0; s < u; s++) {
+        for (int i = 0; i < m; i++) {
+            dp[s][i + 1] = dp[s][i];
+            if (s & (1 << i)) dp[s][i + 1] = (dp[s][i + 1] + dp[s ^ (1 << i)][i]) % mod;
+        }
+        ll tot = ways[s] * (1 + dp[s][m]) % mod;
+        ans = (ans + tot) % mod;
+        for (int i = 0; i <= m; i++) {
+            dp[s][i] = (dp[s][i] + tot) % mod;
+        }
+    }
+    cout << ans << '\n';
+}
+#pragma endregion
+
 // Tree Knapsack of time O(NW)
 // can improve time complexity when question have reliance
 void solve() {
