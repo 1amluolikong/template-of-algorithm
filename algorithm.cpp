@@ -22,7 +22,18 @@ string LCS(string s1, string s2) {
     int m = s2.size();
 }
 
-
+#pragma region 因数分解
+vector<int> divsors[MX + 1];
+constexpr int MX = 1e5;
+auto init = []() {
+    for (int i = 1; i <= MX; i++) {
+        for (int j = i; j <= MX; j += i) {
+            divsors[j].push_back(i);
+        }
+    }
+    return 0;
+}();
+#pragma endregion
 
 // https://usaco.org/index.php?page=viewproblem2&cpid=1309
 #pragma region sos-two-demension
