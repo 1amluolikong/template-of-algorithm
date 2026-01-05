@@ -22,6 +22,8 @@ string LCS(string s1, string s2) {
     int m = s2.size();
 }
 
+
+
 #pragma region 因数分解
 vector<int> divsors[MX + 1];
 constexpr int MX = 1e5;
