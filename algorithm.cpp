@@ -22,7 +22,26 @@ string LCS(string s1, string s2) {
     int m = s2.size();
 }
 
-
+// 最长公共子串
+void solve() {
+    string s1, s2; cin >> s1 >> s2;
+    int n = s1.size();
+    int ans = 0, idx = 0;
+    vector<vector<int>> f(n + 1, vector<int>(n + 1));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (s1[i] == s2[j]) {
+                int& res = f[i + 1][j + 1];
+                res = f[i][j] + 1;
+                if (res > ans) {
+                    ans = res;
+                    idx = i;
+                }
+            }
+        }
+    }
+    cout << s1.substr(idx - ans + 1, ans) << '\n';
+}
 
 #pragma region 因数分解
 vector<int> divsors[MX + 1];
