@@ -23,7 +23,6 @@ string LCS(string s1, string s2) {
 
 }
 
-
 // 最长公共子串
 void solve() {
     string s1, s2; cin >> s1 >> s2;
