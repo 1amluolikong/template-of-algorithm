@@ -23,6 +23,33 @@ string LCS(string s1, string s2) {
 
 }
 
+// dijkstra
+int minCost(int n, vector<vector<int>>& edges) {
+    vector<vector<pair<int, int>>> g(n);
+    for (auto& e : edges) {
+        int x = e[0], y = e[1], w = e[2];
+        g[x].emplace_back(y, w);
+        g[y].emplace_back(x, 2 * w);
+    }
+    vector<int> dis(n, INT_MAX);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;
+    dis[0] = 0;
+    pq.emplace(0, 0);
+    while (!pq.empty()) {
+        auto [dis_x, x] = pq.top();
+        pq.pop();
+        if (dis_x > dis[x]) continue;
+        for (auto& [y, w] : g[x]) {
+            int new_dis = w + dis_x;
+            if (new_dis < dis[y]) {
+                dis[y] = new_dis;
+                pq.emplace(new_dis, y);
+            }
+        }
+    }
+    return dis[n - 1] == INT_MAX ? -1 : dis[n - 1];
+}
+
 // 最长公共子串
 void solve() {
     string s1, s2; cin >> s1 >> s2;
