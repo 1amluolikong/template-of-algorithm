@@ -23,6 +23,32 @@ string LCS(string s1, string s2) {
 
 }
 
+// floyd
+long long minimumCost(string source, string target, vector<char>& original, vector<char>& changed, vector<int>& cost) {
+    constexpr int inf = 0x3f3f3f3f;
+    int dis[26][26]{};
+    memset(dis, 0x3f, sizeof(dis));
+    int m = original.size();
+    for (int i = 0; i < m; i++) {
+        int x = original[i] - 'a', y = changed[i] - 'a', w = cost[i];
+        dis[x][y] = min(dis[x][y], w);
+    }
+    for (int i = 0; i < 26; i++) dis[i][i] = 0;
+    for (int k = 0; k < 26; k++) {
+        for (int i = 0; i < 26; i++) {
+            if (dis[i][k] == inf) continue;
+            for (int j = 0; j < 26; j++) dis[i][j] = min(dis[i][j], dis[i][k] + dis[k][j]);
+        }
+    }
+    long long ans = 0;
+    for (int i = 0; i < source.size(); i++) {
+        int x = source[i] - 'a', y = target[i] - 'a';
+        if (dis[x][y] == inf) return -1;
+        ans += dis[x][y];
+    }
+    return ans;
+}
+
 // dijkstra
 int minCost(int n, vector<vector<int>>& edges) {
     vector<vector<pair<int, int>>> g(n);
